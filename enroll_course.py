@@ -109,10 +109,10 @@ def init_enrollments():
         if eid != lasteid:
             enrolls[eid] = Enrollment(eid)
             enrolls[eid].first_access_time = date2sec(log['time'])
-            lasteid = eid
             if lasteid:
                 enrolls[lasteid].video_count_unique = len(sawvideos)
             sawvideos = set()
+            lasteid = eid
 
         enrolls[eid].last_access_time = date2sec(log['time'])
 

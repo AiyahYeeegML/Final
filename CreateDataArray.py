@@ -40,7 +40,6 @@ if not (enrolls and users and courses):
 # In[24]:
 
 df = pandas.read_csv('./enrollment_train.csv')
-tadf = pandas.read_csv('./sample_train_x.csv')
 
 data = []
 for i in xrange(len(df)):
@@ -65,14 +64,16 @@ for i in xrange(len(df)):
     firstTime = float(enroll.first_access_time) - course.first_release_time
     lastTime = enroll.last_access_time - course.last_release_time
     avgLog = enroll.user_log_num - course.video_num
-    avgAction = enroll.course_log_num / enroll.take_user_num
-    activeActions = tadf.loc[tadf['ID'] == 20]['log_num'][1] - (enroll.course_log_num / enroll.take_user_num)
-    dropRate = user.dropcourseNum / enroll.take_course_num
+    avgAction = float(enroll.course_log_num) / enroll.take_user_num
+    activeActions = enroll.log_num - (float(enroll.course_log_num) / enroll.take_user_num)
+    dropRate = float(user.dropcourseNum) / enroll.take_course_num
     data.append([avgNonRepeatVideo,avgRepeatVideo,v2,v3,firstTime,lastTime,avgLog,avgAction,activeActions,dropRate])
 
-data = np.append(data)
-with open('./data.pkl', 'wb') as f:
-    pickle.dump(data, f)
+    if i % 1000 == 0:
+        print i
+
+data = np.array(data)
+data.dump('./data.np')
 print ('Saveing Features Sucessfully.')
 
 
