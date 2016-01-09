@@ -62,6 +62,9 @@ def init_courses():
 class Enrollment:
     def __init__(self, enrollment_id=''):
         self.enrollment_id = enrollment_id
+        self.userid = ''
+        self.courseid = ''
+
         self.first_access_time = 0.
         self.last_access_time = 0.
         self.video_count_unique = 0
@@ -97,6 +100,7 @@ def init_enrollments():
 
     lasteid = None
     lastlog = None
+    sawvideos = set()
     for i in xrange(len(logdf)):
         log = logdf.iloc[i]
         eid = log['enrollment_id']
@@ -104,22 +108,31 @@ def init_enrollments():
             enrolls[eid] = Enrollment(eid)
             enrolls[eid].first_access_time = log['time']
             lasteid = eid
+            if lasteid:
+                enrolls[lasteid].video_count_unique = len(sawvideos)
+            sawvideos = set()
 
         enrolls[eid].last_access_time = log['time']
+
+        if log['event'] == 'video':
+            sawvideos.add(log['object'])
+
         lastlog = log 
 
         if i % 5000 == 0:
             print i
 
-    print logs[logdf.iloc[0]['enrollment_id']]
-    
+    enrolls[eid].video_count_unique = len(sawvideos)
 
     print 'reading enrollments'
 
     for i in xrange(len(df)):
         row = df.iloc[i]
         eid = row['ID']
-        e = enrolls[e]
+        if eid not in enrolls:
+            print str(eid) + ' not in'
+            break
+        e = enrolls[eid]
         e.user_log_num = row['user_log_num']
         e.course_log_num = row['course_log_num']
         e.take_course_num = row['take_course_num']
@@ -128,33 +141,26 @@ def init_enrollments():
         e.server_access = row['server_access']
         e.video_count = row['video_count']
         
-        ## first,last time
-        # logs = logdf.loc[logdf['enrollment_id'] == eid]
-        logsthis = logs[eid]
-        # print logs.iloc[0]
-        firstdate = datetime.strptime(logsthis.iloc[0]['time'], '%Y-%m-%dT%H:%M:%S')
-        firsttime = (firstdate - epoch).total_seconds()
-        lastdate = datetime.strptime(logsthis.iloc[-1]['time'], '%Y-%m-%dT%H:%M:%S')
-        lasttime = (lastdate - epoch).total_seconds()
-        e.first_access_time = firsttime
-        e.last_access_time = lasttime
-        
-        ## videos unique counts
-        e.video_count_unique = len(logsthis.loc[logsthis['event'] == 'video']['object'].unique())
-        
-    
         if i % 2000 == 0:
             print i
 
+    
+    ## read course user map
+    print 'reading maps'
+    mapdf = pandas.read_csv('./enrollment_train.csv')
+    for i in xrange(len(mapdf)):
+        m = mapdf.iloc[i]
+        eid = m['enrollment_id']
+        enrolls[eid].userid = m['username']
+        enrolls[eid].courseid = m['course_id']
 
     print 'init_courses done.'
     return enrolls
 
 
-
 def main():
-    init_courses()
     init_enrollments()
+    init_courses()
     
 if __name__ == '__main__':
     main()
