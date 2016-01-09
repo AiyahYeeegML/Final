@@ -18,6 +18,7 @@ class Course:
         self.first_release_time = 0. # epoch seconds
         self.last_release_time = 0.  # epoch seconds
         self.video_num = 0
+        self.object_num = 0
     
     def get_first_release_time(self):
         return self.first_release_time
@@ -50,12 +51,16 @@ def init_courses():
         course.last_release_time = (dates[-1] - epoch).total_seconds()
         
         # video num
-        category_df = df.loc[df['course_id'] == cid]['category']
+        coursedf = df.loc[df['course_id'] == cid]
+        category_df = coursedf['category']
         course.video_num = len(category_df[category_df == 'video'])
         
+        # object num
+        course.object_num = len(coursedf)
+
         courses[cid] = course
 
-    print 'init_enrollments done.'
+    print 'init_courses done.'
     return courses
 
 
