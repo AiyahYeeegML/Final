@@ -20,15 +20,6 @@ class Course:
         self.video_num = 0
         self.object_num = 0
     
-    def get_first_release_time(self):
-        return self.first_release_time
-    
-    def get_last_release_time(self):
-        return self.last_release_time
-    
-    def get_video_num(self):
-        return self.video_num
-    
 def init_courses():
     df = pandas.read_csv('./object.csv')
     # get the ocurse_id of the first row: 

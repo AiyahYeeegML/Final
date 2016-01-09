@@ -20,12 +20,6 @@ class User:
         
     def addEnrollment(self,enrollment_id):
         self.enrollment_id.append(enrollment_id)
-        
-    def getCourseNum(self):
-        return self.courseNum
-    
-    def getDropCourseNum(self):
-        return self.dropcourseNum
 
     def getDropRate(self):
         return (self.dropcourseNum/self.courseNum)
