@@ -5,9 +5,9 @@ import cPickle as pickle
 
 def main():
     with open('./enroll.pkl', 'r') as f:
-        enrolls = pickle.dump(f)
+        enrolls = pickle.load(f)
     with open('./users.pkl', 'r') as f:
-        users = pickle.dump(f)
+        users = pickle.load(f)
     with open('./courses.pkl', 'r') as f:
         courses = pickle.load(f)
 
