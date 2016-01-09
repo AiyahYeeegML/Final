@@ -78,6 +78,7 @@ class Enrollment:
         self.course_log_num = 0
         self.take_course_num = 0
         self.take_user_num = 0
+        self.log_num = 0
         
         self.server_navi = 0
         self.server_access = 0
@@ -88,6 +89,11 @@ class Enrollment:
         s += ', '.join('%s: %s\n' % item for item in vars(self).items())
         return s
         
+def date2sec(datestr):
+    epoch = datetime.utcfromtimestamp(0)
+    date = datetime.strptime(datestr, '%Y-%m-%dT%H:%M:%S')
+    return (date - epoch).total_seconds()
+    
 
 def init_enrollments():
     epoch = datetime.utcfromtimestamp(0)
@@ -111,13 +117,13 @@ def init_enrollments():
         eid = log['enrollment_id']
         if eid != lasteid:
             enrolls[eid] = Enrollment(eid)
-            enrolls[eid].first_access_time = log['time']
+            enrolls[eid].first_access_time = date2sec(log['time'])
             lasteid = eid
             if lasteid:
                 enrolls[lasteid].video_count_unique = len(sawvideos)
             sawvideos = set()
 
-        enrolls[eid].last_access_time = log['time']
+        enrolls[eid].last_access_time = date2sec(log['time'])
 
         if log['event'] == 'video':
             sawvideos.add(log['object'])
@@ -142,6 +148,7 @@ def init_enrollments():
         e.course_log_num = row['course_log_num']
         e.take_course_num = row['take_course_num']
         e.take_user_num = row['take_user_num']
+        e.log_num = row['log_num']
         e.server_navi = row['server_nagivate']
         e.server_access = row['server_access']
         e.video_count = row['video_count']
