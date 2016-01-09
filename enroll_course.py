@@ -20,7 +20,7 @@ class Course:
         self.video_num = 0
         self.object_num = 0
     
-def init_courses():
+def init_courses(train=1):
     df = pandas.read_csv('./object.csv')
     # get the ocurse_id of the first row: 
     #    data.iloc[0]['course_id']
@@ -86,12 +86,19 @@ def date2sec(datestr):
     return (date - epoch).total_seconds()
     
 
-def init_enrollments():
+def init_enrollments(train=1):
     epoch = datetime.utcfromtimestamp(0)
     enrolls = {}
     
-    df = pandas.read_csv('./sample_train_x.csv')
-    logdf = pandas.read_csv('./log_train.csv')
+    if train:
+        df = pandas.read_csv('./sample_train_x.csv')
+        logdf = pandas.read_csv('./log_train.csv')
+        mapdf = pandas.read_csv('./enrollment_train.csv')
+    else:
+        df = pandas.read_csv('./sample_test_x.csv')
+        logdf = pandas.read_csv('./log_test.csv')
+        mapdf = pandas.read_csv('./enrollment_test.csv')
+
     logs = {}
 
 
@@ -150,7 +157,7 @@ def init_enrollments():
     
     ## read course user map
     print 'reading maps'
-    mapdf = pandas.read_csv('./enrollment_train.csv')
+
     for i in xrange(len(mapdf)):
         m = mapdf.iloc[i]
         eid = m['enrollment_id']
